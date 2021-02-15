@@ -207,18 +207,18 @@ def create_venue_submission():
   venueFormData = VenueForm(request.form)
   err=False
   try:
-    venueData=Venue(
-      name=venueFormData.name.data,
-      city=venueFormData.city.data,
-      state=venueFormData.state.data,
-      address=venueFormData.address.data,
-      phone=venueFormData.phone.data,
-      image_link=venueFormData.image_link.data,
-      facebook_link=venueFormData.facebook_link.data,
-      genres=list(venueFormData.genres.data),
-      seeking_talent=venueFormData.seeking_talent.data,
-      seeking_description=venueFormData.seeking_description.data,
-      website=venueFormData.website.data)
+    venueData = Venue(
+      name = venueFormData.name.data,
+      city = venueFormData.city.data,
+      state = venueFormData.state.data,
+      address = venueFormData.address.data,
+      phone = venueFormData.phone.data,
+      image_link = venueFormData.image_link.data,
+      facebook_link = venueFormData.facebook_link.data,
+      genres = list(venueFormData.genres.data),
+      seeking_talent = venueFormData.seeking_talent.data,
+      seeking_description = venueFormData.seeking_description.data,
+      website = venueFormData.website.data)
     db.session.add(venueData)
     db.session.commit()
   except:
@@ -289,7 +289,7 @@ def show_artist(artist_id):
   past_shows = []
   upcoming_shows = []
 
-  artistData=Artist.query.get(artist_id)
+  artistData = Artist.query.get(artist_id)
   print(artistData)
   pastShowsData = db.session.query(Show).join(Venue).filter(Show.artist_id == artist_id).filter(Show.start_time>datetime.now()).all()
   upcomingShowsData = db.session.query(Show).join(Venue).filter(Show.artist_id == artist_id).filter(Show.start_time<datetime.now()).all()
@@ -357,16 +357,16 @@ def edit_artist_submission(artist_id):
   print(artistFormData)
   err=False
   try:
-    normalisedData.name=artistFormData.name.data
-    normalisedData.city=artistFormData.city.data
-    normalisedData.state=artistFormData.state.data
-    normalisedData.phone=artistFormData.phone.data
-    normalisedData.image_link=artistFormData.image_link.data
-    normalisedData.facebook_link=artistFormData.facebook_link.data
-    normalisedData.genres=list(artistFormData.genres.data)
-    normalisedData.seeking_venue=artistFormData.seeking_venue.data
-    normalisedData.seeking_description=artistFormData.seeking_description.data
-    normalisedData.website=artistFormData.website.data
+    normalisedData.name = artistFormData.name.data
+    normalisedData.city = artistFormData.city.data
+    normalisedData.state = artistFormData.state.data
+    normalisedData.phone = artistFormData.phone.data
+    normalisedData.image_link = artistFormData.image_link.data
+    normalisedData.facebook_link = artistFormData.facebook_link.data
+    normalisedData.genres = list(artistFormData.genres.data)
+    normalisedData.seeking_venue = artistFormData.seeking_venue.data
+    normalisedData.seeking_description = artistFormData.seeking_description.data
+    normalisedData.website = artistFormData.website.data
     db.session.commit()
   except:
     err=True
@@ -404,21 +404,21 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  normalisedData=Venue.query.get(venue_id)
-  venueFormData=VenueForm(request.form)
+  normalisedData = Venue.query.get(venue_id)
+  venueFormData = VenueForm(request.form)
   err=False
   try:
-    normalisedData.name=venueFormData.name.data
-    normalisedData.genres=list(venueFormData.genres.data)
-    normalisedData.address=venueFormData.address.data
-    normalisedData.city=venueFormData.city.data
-    normalisedData.state=venueFormData.state.data
-    normalisedData.phone=venueFormData.phone.data
-    normalisedData.image_link=venueFormData.image_link.data
-    normalisedData.facebook_link=venueFormData.facebook_link.data
-    normalisedData.seeking_talent=venueFormData.seeking_talent.data
-    normalisedData.seeking_description=venueFormData.seeking_description.data
-    normalisedData.website=venueFormData.website.data
+    normalisedData.name = venueFormData.name.data
+    normalisedData.genres = list(venueFormData.genres.data)
+    normalisedData.address = venueFormData.address.data
+    normalisedData.city = venueFormData.city.data
+    normalisedData.state = venueFormData.state.data
+    normalisedData.phone = venueFormData.phone.data
+    normalisedData.image_link = venueFormData.image_link.data
+    normalisedData.facebook_link = venueFormData.facebook_link.data
+    normalisedData.seeking_talent = venueFormData.seeking_talent.data
+    normalisedData.seeking_description = venueFormData.seeking_description.data
+    normalisedData.website = venueFormData.website.data
     db.session.commit()
   except:
     err=True
@@ -446,17 +446,17 @@ def create_artist_submission():
   artistFormData = ArtistForm(request.form)
   err=False
   try:
-    artistData=Artist(
-      name=artistFormData.name.data,
-      city=artistFormData.city.data,
-      state=artistFormData.state.data,
-      phone=artistFormData.phone.data,
-      image_link=artistFormData.image_link.data,
-      facebook_link=artistFormData.facebook_link.data,
-      genres=list(artistFormData.genres.data),
-      seeking_venue=artistFormData.seeking_venue.data,
-      seeking_description=artistFormData.seeking_description.data,
-      website=artistFormData.website.data)
+    artistData = Artist(
+      name = artistFormData.name.data,
+      city = artistFormData.city.data,
+      state = artistFormData.state.data,
+      phone = artistFormData.phone.data,
+      image_link = artistFormData.image_link.data,
+      facebook_link = artistFormData.facebook_link.data,
+      genres = list(artistFormData.genres.data),
+      seeking_venue = artistFormData.seeking_venue.data,
+      seeking_description = artistFormData.seeking_description.data,
+      website = artistFormData.website.data)
     db.session.add(artistData)
     db.session.commit()
   except:
@@ -502,9 +502,9 @@ def create_show_submission():
   err=False
   try:
     showData=Show(
-      artist_id=showFormData.artist_id.data,
-      venue_id=showFormData.venue_id.data,
-      start_time=showFormData.start_time.data
+      artist_id = showFormData.artist_id.data,
+      venue_id = showFormData.venue_id.data,
+      start_time = showFormData.start_time.data
     )
     db.session.add(showData)
     db.session.commit()

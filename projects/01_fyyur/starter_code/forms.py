@@ -18,8 +18,8 @@ class ShowForm(FlaskForm):
     )
     start_time = DateTimeField(
         'start_time',
-        validators=[DataRequired()],
-        default= datetime.today()
+        validators = [DataRequired()],
+        default = datetime.today()
     )
 
 class VenueForm(FlaskForm):
@@ -198,8 +198,8 @@ class ArtistForm(FlaskForm):
     )
     genres = SelectMultipleField(
         # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
-        choices=[
+        'genres', validators = [DataRequired()],
+        choices = [
             ('Alternative', 'Alternative'),
             ('Blues', 'Blues'),
             ('Classical', 'Classical'),
