@@ -1,7 +1,6 @@
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
-
 import json
 import dateutil.parser
 import babel
@@ -15,79 +14,15 @@ from forms import *
 from flask_migrate import Migrate
 import sys
 from datetime import datetime
+from models import *
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
-
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
-# TODO: connect to a local postgresql database
-
-#----------------------------------------------------------------------------#
-# Models.
-#----------------------------------------------------------------------------#
-
-class Venue(db.Model):
-    __tablename__ = 'venues'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    city = db.Column(db.String(120), nullable=False)
-    state = db.Column(db.String(120), nullable=False)
-    address = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(120), nullable=False)
-    image_link = db.Column(db.String(500), nullable=True, default="https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80")
-    facebook_link = db.Column(db.String(120), nullable=True, default="")
-    genres = db.Column(db.String(200))
-    seeking_talent = db.Column(db.Boolean, nullable=True, default=False)
-    seeking_description = db.Column(db.String(150), nullable=True)
-    website = db.Column(db.String(120), nullable=True)
-
-    venue_reg_shows = db.relationship('Show', backref='venueShow')
-
-    def __repr__(self):
-      return f'<Venue {self.id} {self.name}>'
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-class Artist(db.Model):
-    __tablename__ = 'artists'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    city = db.Column(db.String(120), nullable=False)
-    state = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(120), nullable=False)
-    genres = db.Column(db.String(120))
-    image_link = db.Column(db.String(500), nullable=True, default="https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80")
-    facebook_link = db.Column(db.String(120), nullable=True, default="")
-    genres = db.Column(db.String(200))
-    seeking_description = db.Column(db.String(150), nullable=True, default="")
-    seeking_venue = db.Column(db.String(120), nullable=True, default=False)
-    website = db.Column(db.String(120), nullable=True, default="")
-
-    artist_reg_shows = db.relationship('Show', backref='artistShow')
-    
-    def __repr__(self):
-      return f'<Artist {self.id} {self.name}>'
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-class Show(db.Model):
-  __tablename__ = 'shows'
-  id = db.Column(db.Integer, primary_key=True)
-  artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
-  venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=False)
-  start_time = db.Column(db.DateTime, nullable=False)
-
-  def __repr__(self):
-    return f'<shows {self.id}>'
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -215,7 +150,7 @@ def create_venue_submission():
       phone = venueFormData.phone.data,
       image_link = venueFormData.image_link.data,
       facebook_link = venueFormData.facebook_link.data,
-      genres = list(venueFormData.genres.data),
+      genres = venueFormData.genres.data,
       seeking_talent = venueFormData.seeking_talent.data,
       seeking_description = venueFormData.seeking_description.data,
       website = venueFormData.website.data)
@@ -312,7 +247,7 @@ def show_artist(artist_id):
   transformedData={
     "id": artistData.id,
     "name": artistData.name,
-    "genres": list(artistData.genres),
+    "genres": artistData.genres,
     "city": artistData.city,
     "state": artistData.state,
     "phone": artistData.phone,
@@ -336,7 +271,7 @@ def edit_artist(artist_id):
   artistData = Artist.query.get(artist_id)
   try:
     form.name.data = artistData.name
-    form.genres.data = list(artistData.genres)
+    form.genres.data = artistData.genres
     form.city.data = artistData.city
     form.state.data = artistData.state
     form.phone.data = artistData.phone
@@ -363,7 +298,7 @@ def edit_artist_submission(artist_id):
     normalisedData.phone = artistFormData.phone.data
     normalisedData.image_link = artistFormData.image_link.data
     normalisedData.facebook_link = artistFormData.facebook_link.data
-    normalisedData.genres = list(artistFormData.genres.data)
+    normalisedData.genres = artistFormData.genres.data
     normalisedData.seeking_venue = artistFormData.seeking_venue.data
     normalisedData.seeking_description = artistFormData.seeking_description.data
     normalisedData.website = artistFormData.website.data
@@ -387,7 +322,7 @@ def edit_venue(venue_id):
   venueData = Venue.query.get(venue_id)
   try:
     form.name.data = venueData.name
-    form.genres.data = list(venueData.genres)
+    form.genres.data = venueData.genres
     form.address.data = venueData.address
     form.city.data = venueData.city
     form.state.data = venueData.state
@@ -409,7 +344,7 @@ def edit_venue_submission(venue_id):
   err=False
   try:
     normalisedData.name = venueFormData.name.data
-    normalisedData.genres = list(venueFormData.genres.data)
+    normalisedData.genres = venueFormData.genres.data
     normalisedData.address = venueFormData.address.data
     normalisedData.city = venueFormData.city.data
     normalisedData.state = venueFormData.state.data
@@ -453,7 +388,7 @@ def create_artist_submission():
       phone = artistFormData.phone.data,
       image_link = artistFormData.image_link.data,
       facebook_link = artistFormData.facebook_link.data,
-      genres = list(artistFormData.genres.data),
+      genres = artistFormData.genres.data,
       seeking_venue = artistFormData.seeking_venue.data,
       seeking_description = artistFormData.seeking_description.data,
       website = artistFormData.website.data)
