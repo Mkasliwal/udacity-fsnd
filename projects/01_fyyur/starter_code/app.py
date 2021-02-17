@@ -140,6 +140,7 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
   venueFormData = VenueForm(request.form)
+  temp_genres = venueFormData.genres.data
   err=False
   try:
     venueData = Venue(
@@ -150,7 +151,7 @@ def create_venue_submission():
       phone = venueFormData.phone.data,
       image_link = venueFormData.image_link.data,
       facebook_link = venueFormData.facebook_link.data,
-      genres = venueFormData.genres.data,
+      genres = temp_genres.split(","),
       seeking_talent = venueFormData.seeking_talent.data,
       seeking_description = venueFormData.seeking_description.data,
       website = venueFormData.website.data)
