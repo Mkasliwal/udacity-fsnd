@@ -14,7 +14,7 @@ from forms import *
 from flask_migrate import Migrate
 import sys
 from datetime import datetime
-from models import *
+from models import Venue, Artist, Show
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
