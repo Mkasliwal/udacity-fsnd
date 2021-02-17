@@ -140,7 +140,6 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
   venueFormData = VenueForm(request.form)
-  temp_genres = venueFormData.genres.data
   err=False
   try:
     venueData = Venue(
@@ -151,7 +150,7 @@ def create_venue_submission():
       phone = venueFormData.phone.data,
       image_link = venueFormData.image_link.data,
       facebook_link = venueFormData.facebook_link.data,
-      genres = temp_genres.split(","),
+      genres = ','.join(venueFormData.genres.data),
       seeking_talent = venueFormData.seeking_talent.data,
       seeking_description = venueFormData.seeking_description.data,
       website = venueFormData.website.data)
@@ -299,7 +298,7 @@ def edit_artist_submission(artist_id):
     normalisedData.phone = artistFormData.phone.data
     normalisedData.image_link = artistFormData.image_link.data
     normalisedData.facebook_link = artistFormData.facebook_link.data
-    normalisedData.genres = artistFormData.genres.data
+    normalisedData.genres = ','.join(artistFormData.genres.data)
     normalisedData.seeking_venue = artistFormData.seeking_venue.data
     normalisedData.seeking_description = artistFormData.seeking_description.data
     normalisedData.website = artistFormData.website.data
@@ -345,7 +344,7 @@ def edit_venue_submission(venue_id):
   err=False
   try:
     normalisedData.name = venueFormData.name.data
-    normalisedData.genres = venueFormData.genres.data
+    normalisedData.genres = ','.join(venueFormData.genres.data)
     normalisedData.address = venueFormData.address.data
     normalisedData.city = venueFormData.city.data
     normalisedData.state = venueFormData.state.data
@@ -389,7 +388,7 @@ def create_artist_submission():
       phone = artistFormData.phone.data,
       image_link = artistFormData.image_link.data,
       facebook_link = artistFormData.facebook_link.data,
-      genres = artistFormData.genres.data,
+      genres = ','.join(artistFormData.genres.data),
       seeking_venue = artistFormData.seeking_venue.data,
       seeking_description = artistFormData.seeking_description.data,
       website = artistFormData.website.data)
