@@ -31,38 +31,57 @@ def create_app(test_config=None):
 
   @app.route('/categories')
   def get_categories():
-    categories = Category.query.all()
-
-    return jsonify({
-      'success': True,
-      'categories': {category.id: category.type for category in categories}
-    })
+    err = False
+    try:
+      categories = Category.query.all()
+    except:
+      err = True
+    finally:
+      if not err:
+        return jsonify({
+          'success': True,
+          'categories': {category.id: category.type for category in categories}
+        })
+      else:
+        abort(404)
 
   @app.route('/questions')
   def get_data():
-    questions = Question.query.order_by(Question.id).all()
-
-    formatedQuestion = paginate(request, questions)
-    categories = Category.query.all()
-
-    return jsonify({
-      'success': True,
-      'questions': formatedQuestion,
-      'categories': {category.id: category.type for category in categories},
-      'numberOfQuestions': len(questions)
-    })
+    err = False
+    try:
+      questions = Question.query.order_by(Question.id).all()
+      formatedQuestion = paginate(request, questions)
+      categories = Category.query.all()
+    except:
+      err = True
+    finally:
+      if not err:
+        return jsonify({
+          'success': True,
+          'questions': formatedQuestion,
+          'categories': {category.id: category.type for category in categories},
+          'total_questions': len(questions),
+          'currentCategory': None
+        })
+      else:
+        abort(404)
 
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question_by_id(question_id):
+    err = False
     try:
       question = Question.query.get(question_id)
       question.delete()
-      return jsonify({
-        'success': True,
-        'question': question.question
-      })
     except:
-      abort(422)
+      err = True
+    finally:
+      if not err:
+          return jsonify({
+          'success': True,
+          'question': question.question
+        })
+      else:
+        abort(422)
 
   @app.route('/questions', methods=['POST'])
   def create_question():
@@ -85,54 +104,86 @@ def create_app(test_config=None):
           'success': True,
         })
       else:
-        print("Something Went Wrong")
+        abort(422)
 
   @app.route('/questions/search',methods=['POST'])
   def search():
-    body = request.get_json()
-    data = body.get('searchTerm', None)
+    err = False
+    try:
+      body = request.get_json()
+      data = body.get('searchTerm', None)
 
-    if data:
-      searchData = Question.query.filter(Question.question.ilike(f'%{data}%')).all()
-
-      return jsonify({
-        'success': True,
-        'questions': [el.format() for el in searchData],
-      })
+      if data:
+        searchData = Question.query.filter(Question.question.ilike(f'%{data}%')).all()
+    except:
+      err = True
+    finally:
+      if not err:
+        return jsonify({
+          'success': True,
+          'questions': [el.format() for el in searchData],
+        })
+      else:
+        abort(404)
 
 
   @app.route('/categories/<int:category_id>/questions')
   def get_question_by_category(category_id):
-    normalisedQuestion = Question.query.filter(Question.category == str(category_id))
-    tranformedQuestion = [question.format() for question in normalisedQuestion]
-    return jsonify({
-      'success':True,
-      'questions': tranformedQuestion,
-    })
+    err = False
+    try:
+      normalisedQuestion = Question.query.filter(Question.category == str(category_id))
+      tranformedQuestion = [question.format() for question in normalisedQuestion]
+    except:
+      err = True
+    finally:
+      if not err:
+        return jsonify({
+          'success':True,
+          'questions': tranformedQuestion,
+        })
+      else:
+        abort(404)
 
   @app.route('/quizzes',methods=['POST'])
   def play_quiz():
-    body = request.get_json()
-    category = body.get('quiz_category')
-    prevQuestion = body.get('previous_questions')
+    err = False
+    try:
+      body = request.get_json()
+      category = body.get('quiz_category')
+      prevQuestion = body.get('previous_questions')
 
-    if category['id'] == 0:
-      questions = Question.query.filter(Question.id.notin_(prevQuestion)).all()
-    else:
-      questions = Question.query.filter(Question.category == category['id']).filter(Question.id.notin_(prevQuestion)).all()
+      if category['id'] == 0:
+        questions = Question.query.filter(Question.id.notin_(prevQuestion)).all()
+      else:
+        questions = Question.query.filter(Question.category == category['id']).filter(Question.id.notin_(prevQuestion)).all()
 
-    randomisedQuestions = random.choice(questions).format()    
+      randomisedQuestions = random.choice(questions).format()
+    except:
+      err = True
+    finally:
+      if not err:
+        return jsonify({
+          'success': True,
+          'question': randomisedQuestions
+        })
+      else:
+        abort(404)
 
+  @app.errorhandler(404)
+  def page_not_found(error):
     return jsonify({
-      'success': True,
-      'question': randomisedQuestions
-    })
+      'success': False,
+      'error': 404,
+      'message': 'Page Not Found'
+    }), 404
 
-  '''
-  @TODO: 
-  Create error handlers for all expected errors 
-  including 404 and 422. 
-  '''
+  @app.errorhandler(422)
+  def unprocessable(error):
+    return jsonify({
+      'success': False,
+      'error': 422,
+      'message': 'Unprocessable'
+    }), 422
   
   return app
 
