@@ -52,6 +52,8 @@ def create_app(test_config=None):
       questions = Question.query.order_by(Question.id).all()
       formatedQuestion = paginate(request, questions)
       categories = Category.query.all()
+      if len(formatedQuestion) == 0:
+        err = True
     except:
       err = True
     finally:
