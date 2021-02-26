@@ -34,6 +34,8 @@ def create_app(test_config=None):
     err = False
     try:
       categories = Category.query.all()
+      if len(categories) == 0:
+        err = True
     except:
       err = True
     finally:
@@ -73,7 +75,10 @@ def create_app(test_config=None):
     err = False
     try:
       question = Question.query.get(question_id)
-      question.delete()
+      if question:
+        question.delete()
+      else:
+        err = True
     except:
       err = True
     finally:
@@ -96,10 +101,12 @@ def create_app(test_config=None):
     )
     err = False
     try:
-      formData.insert()
+      if ('question' in body and 'answer' in body and 'difficulty' in body and 'category' in body):
+        formData.insert()
+      else:
+        err = True
     except:
       err = True
-      abort(422)
     finally:
       if not err:
         return jsonify({
@@ -114,9 +121,10 @@ def create_app(test_config=None):
     try:
       body = request.get_json()
       data = body.get('searchTerm', None)
-
-      if data:
-        searchData = Question.query.filter(Question.question.ilike(f'%{data}%')).all()
+      searchData = Question.query.filter(Question.question.ilike(f'%{data}%')).all()
+      
+      if len(searchData) == 0:
+        err = True
     except:
       err = True
     finally:
@@ -135,6 +143,9 @@ def create_app(test_config=None):
     try:
       normalisedQuestion = Question.query.filter(Question.category == str(category_id))
       tranformedQuestion = [question.format() for question in normalisedQuestion]
+
+      if len(tranformedQuestion) == 0:
+        err = True
     except:
       err = True
     finally:
@@ -154,12 +165,16 @@ def create_app(test_config=None):
       category = body.get('quiz_category')
       prevQuestion = body.get('previous_questions')
 
+      if ('quiz_category' not in body and 'previous_questions' not in body):
+        err = True
+
       if category['id'] == 0:
         questions = Question.query.filter(Question.id.notin_(prevQuestion)).all()
       else:
         questions = Question.query.filter(Question.category == category['id']).filter(Question.id.notin_(prevQuestion)).all()
 
       randomisedQuestions = random.choice(questions).format()
+
     except:
       err = True
     finally:
