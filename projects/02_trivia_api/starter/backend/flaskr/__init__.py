@@ -85,7 +85,7 @@ def create_app(test_config=None):
       if not err:
           return jsonify({
           'success': True,
-          'question': question.question
+          'question': question.id
         })
       else:
         abort(422)
