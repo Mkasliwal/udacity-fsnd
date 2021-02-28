@@ -3,6 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
+import sys
 
 from models import setup_db, Question, Category
 
@@ -10,12 +11,12 @@ QUESTIONS_PER_PAGE = 10
 
 
 def paginate(request, data):
-    page = request.args.get('page', 1, type=int)
-    start = (page - 1) * QUESTIONS_PER_PAGE
-    end = start + QUESTIONS_PER_PAGE
-
-    normalisedData = [el.format() for el in data]
-    transformedData = normalisedData[start:end]
+    limit_rows = request.args.get('limit', QUESTIONS_PER_PAGE, type=int)
+    selected_page = request.args.get('page', 1, type=int)
+    current_index = selected_page - 1
+    filteredData = data.limit(limit_rows).offset(
+        current_index * limit_rows).all()
+    transformedData = [el.format() for el in filteredData]
     return transformedData
 
 
@@ -45,6 +46,7 @@ def create_app(test_config=None):
                 err = True
         except:
             err = True
+            print(sys.exc_info())
         finally:
             if not err:
                 return jsonify({
@@ -60,13 +62,14 @@ def create_app(test_config=None):
     def get_data():
         err = False
         try:
-            questions = Question.query.order_by(Question.id).all()
+            questions = Question.query.order_by(Question.id)
             formatedQuestion = paginate(request, questions)
             categories = Category.query.all()
             if len(formatedQuestion) == 0:
                 err = True
         except:
             err = True
+            print(sys.exc_info())
         finally:
             if not err:
                 return jsonify({
@@ -75,7 +78,7 @@ def create_app(test_config=None):
                     'categories': {
                         category.id: category.type for category in categories
                         },
-                    'total_questions': len(questions),
+                    'total_questions': len(questions.all()),
                     'currentCategory': None
                 })
             else:
@@ -92,6 +95,7 @@ def create_app(test_config=None):
                 err = True
         except:
             err = True
+            print(sys.exc_info())
         finally:
             if not err:
                 return jsonify({
@@ -123,6 +127,7 @@ def create_app(test_config=None):
                 err = True
         except:
             err = True
+            print(sys.exc_info())
         finally:
             if not err:
                 return jsonify({
@@ -144,6 +149,7 @@ def create_app(test_config=None):
                 err = True
         except:
             err = True
+            print(sys.exc_info())
         finally:
             if not err:
                 return jsonify({
@@ -167,6 +173,7 @@ def create_app(test_config=None):
                 err = True
         except:
             err = True
+            print(sys.exc_info())
         finally:
             if not err:
                 return jsonify({
@@ -214,6 +221,8 @@ def create_app(test_config=None):
 
         except:
             err = True
+            abort(404)
+            print(sys.exc_info())
 
     @app.errorhandler(404)
     def page_not_found(error):

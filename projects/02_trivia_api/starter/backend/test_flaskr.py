@@ -152,7 +152,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
 
     def test_unsuccessful_quiz_play(self):
-        quizQuestion = {'quiz_category': {'type': 'Entertainment', 'id': 500}}
+        quizQuestion = {'quiz_category': {'type': 'Entertainment', 'id': 1000}}
         res = self.client().post('/quizzes', json=quizQuestion)
         data = json.loads(res.data)
 
