@@ -44,9 +44,9 @@ def create_app(test_config=None):
             categories = Category.query.all()
             if len(categories) == 0:
                 err = True
-        except:
+        except Exception as error:
             err = True
-            print(sys.exc_info())
+            print('Error Occured: {}' format(error))
         finally:
             if not err:
                 return jsonify({
@@ -67,9 +67,10 @@ def create_app(test_config=None):
             categories = Category.query.all()
             if len(formatedQuestion) == 0:
                 err = True
-        except:
+        except Exception as error:
             err = True
             print(sys.exc_info())
+            print('Error Occured: {}' format(error))
         finally:
             if not err:
                 return jsonify({
@@ -93,9 +94,9 @@ def create_app(test_config=None):
                 question.delete()
             else:
                 err = True
-        except:
+        except Exception as error:
             err = True
-            print(sys.exc_info())
+            print('Error Occured: {}' format(error))
         finally:
             if not err:
                 return jsonify({
@@ -125,9 +126,9 @@ def create_app(test_config=None):
                 formData.insert()
             else:
                 err = True
-        except:
+        except Exception as error:
             err = True
-            print(sys.exc_info())
+            print('Error Occured: {}' format(error))
         finally:
             if not err:
                 return jsonify({
@@ -147,9 +148,9 @@ def create_app(test_config=None):
                 ).all()
             if len(searchData) == 0:
                 err = True
-        except:
+        except Exception as error:
             err = True
-            print(sys.exc_info())
+            print('Error Occured: {}' format(error))
         finally:
             if not err:
                 return jsonify({
@@ -171,9 +172,9 @@ def create_app(test_config=None):
 
             if len(tranformedQuestion) == 0:
                 err = True
-        except:
+        except Exception as error:
             err = True
-            print(sys.exc_info())
+            print('Error Occured: {}' format(error))
         finally:
             if not err:
                 return jsonify({
@@ -219,10 +220,10 @@ def create_app(test_config=None):
                 'question': randomisedQuestions
             })
 
-        except:
+        except Exception as error:
             err = True
             abort(404)
-            print(sys.exc_info())
+            print('Error Occured: {}' format(error))
 
     @app.errorhandler(404)
     def page_not_found(error):
