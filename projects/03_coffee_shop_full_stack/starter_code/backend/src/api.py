@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
+import sys
 
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
@@ -11,43 +12,65 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
-'''
-@TODO uncomment the following line to initialize the datbase
-!! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
-!! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
-'''
 # db_drop_and_create_all()
 
 ## ROUTES
-'''
-@TODO implement endpoint
-    GET /drinks
-        it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
+
+@app.route('/drinks')
+def get_normaldrinks():
+    err = True
+    try:
+        drinks = Drink.query.all()
+        
+        formattedDrinks = [el.short() for el in drinks]
+        return jsonify({
+            'success': True,
+            'drinks': formattedDrinks
+        })
+    except Exception as error:
+        err = True
+        print(sys.exc_info())
+        abort(404)
+
+@app.route('/drinks-detail')
+@requires_auth('get:drinks-detail')
+def get_completedrinks(jwt):
+    err = False
+    try:
+        drinks = Drink.query.order_by(id).all()
+        formattedDrinks = [el.long() for el in drinks]
+        return jsonify({
+            'success': True,
+            'drinks': formattedDrinks
+        })
+    except Exception as error:
+        err = True
+        print(sys.exc_info())
+        abort(404)
 
 
-'''
-@TODO implement endpoint
-    GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
-
-
-'''
-@TODO implement endpoint
-    POST /drinks
-        it should create a new row in the drinks table
-        it should require the 'post:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
-'''
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def create_drinks(jwt):
+    body = request.get_json()
+    drinks = Drink(
+            title=body.get('title'),
+            recipe=body.get('recipe'),
+        )
+    try:
+        if(title not in body and recipe not in body):
+            err = True
+            print(body)
+        else:
+            drinks.insert()
+        
+        return jsonify({
+            'success': True,
+            'drinks': [drinks.long()]
+        })
+    except Exception as error:
+        err = True
+        abort(422)
 
 
 '''
@@ -108,3 +131,10 @@ def unprocessable(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+@app.errorhandler(AuthError)
+def auth_err(e):
+    return jsonify({
+        'success': False,
+        'status-code': e.status_code,
+        'message': e.error,
+    }, 401)
