@@ -1,0 +1,1 @@
+DATABASE_URL='postgres://postgres:131252118@localhost:5432/herokutest'
