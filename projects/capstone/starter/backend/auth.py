@@ -8,7 +8,7 @@ import json
 
 AUTH0_DOMAIN = 'mkfsnd.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'capstone'
+API_AUDIENCE = 'capstonetest'
 
 ## AuthError Exception
 '''
@@ -128,7 +128,9 @@ def requires_auth(permission=''):
         @wraps(f)
         def wrapper(*args, **kwargs):
             token = get_token_auth_header()
+            print(token)
             payload = verify_decode_jwt(token)
+            print(payload)
             check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
 
